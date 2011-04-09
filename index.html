@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>index</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="jquery.wut.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" charset="utf-8">
+      $(function(){
+        var els = $('#phone,#name').validizzle();
+        $('#btn').click(function(){
+          els.validizzle('is_valid');
+        });
+        // p = document.getElementById('phone');
+        // p.validate = function(){
+        //   alert($(p).attr('name'));
+        // };
+        // 
+        // p.validate();
+        
+        // $('#first_name').wut_validate({
+        //           builtin: ["required","letters"]
+        //         });
+        // console.log('here');
+        //         $('#name,#phone').validizzle();
+        //         console.log('there');
+        // $('#btn').click(function(){
+        //     alert('name: ' + $('#name').validizzle('is_valid'));
+        //     alert('phone: ' + $('#phone').validizzle('is_valid'));
+        // });
+        
+        // $.data(document.body,'fn',"(function(){alert('test');})()");
+        //         
+        //         eval($.data(document.body,'fn')());
+      });
+    </script>
+  </head>
+  <body id="index" onload="">
+    <!-- 
+    length of
+    arbitrary regex
+      letters
+      numbers
+      alphanumeric
+      telephone
+      email
+    group must have something selected
+    min, max
+    classes for error
+      auto-append error messages? 
+      -->
+    <label for="name">name</label>
+    <input type="text" name="name" value="" id="name"/>
+    <br />
+    <br />
+    <label for="phone">phone</label>
+    <input type="text" name="phone" value="" id="phone" />
+    <br />
+    <br />
+    <label for="email">email</label>
+    <input type="text" name="some_name" value="" id="some_name" />
+    <br />
+    <br />
+    <button type="button" id="btn">click me motherfucker</button>
+  </body>
+</html>
