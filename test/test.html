@@ -51,6 +51,15 @@
       });
     });
     
+    test("test email validation that is not required", function(){
+      expect(2);
+      var $el = setUp("").validizzle({builtins:['email']});
+      strictEqual(true, v($el), "blank value should be valid if email is not required");
+      
+      $el.val("   ");
+      strictEqual(false, v($el), "whitespace should be invalid if email is not required");
+    });
+    
     test("test email builtin failure", function(){
       expect(3);
       ["valid@testcom", "ian.asafftest.com", "Test_You[]00&@@boo.gov"].map(function(input){
@@ -79,6 +88,27 @@
       
       $el.val('   ');
       strictEqual(false, v($el), "whitespace input should fail");
+    });
+    
+    test("test required email. order of rules shouldn't matter.",function(){
+       expect(8);
+       [['email','required'],['required','email']].map(function(input){
+          (function(){
+            var $el = setUp("").validizzle({
+              builtins: ['email','required']
+            });
+            strictEqual(false, v($el), "blank fails if email is required");
+
+            $el.val('  ');
+            strictEqual(false, v($el), "whitespace fails if email is required");
+
+            $el.val('test@test');
+            strictEqual(false, v($el), "invalid email fails if email is required: |test@test|");
+
+            $el.val('bite@me.gov');
+            strictEqual(true, v($el), "valid email passes if email is required")
+          })();
+        });
     });
   });
   </script>
