@@ -4,34 +4,107 @@
   <script src="http://code.jquery.com/jquery-latest.js"></script>
   <link rel="stylesheet" href="http://code.jquery.com/qunit/git/qunit.css" type="text/css" media="screen" />
 <script type="text/javascript" src="http://code.jquery.com/qunit/git/qunit.js"></script>
+<script src="jquery.validizzle.js" type="text/javascript" charset="utf-8"></script>
 
   <script>
   $(document).ready(function(){
+    /* HELPER FUNCTIONS */
+    function d(input){
+  		if (d.dbg){
+  			console.log(input);
+  		}
+  	}
+  	d.dbg = true;
+  	
+    function setUp(val){
+      var value = val === undefined ? "" : val;
+      return $('<input type="text" value="' + value + '" name="test_input"/>')
+    }
     
-test("a basic test example", function() {
-  ok( true, "this test is fine" );
-  var value = "hello";
-  equals( "hello", value, "We expect value to be hello" );
-});
+    function v($el){
+      return $el.validizzle('is_valid');
+    }
+    
+    /* TEST CODE */
+    module("validizzle");
+    test("testing unobtrusiveness", function(){
+      expect(2);
+      var $el = setUp().validizzle();
+      strictEqual(true, v($el), "no params passed in should always return true");
+      
+      $el = setUp().validizzle({
+        builtins: ['email']
+      });
+      
+      strictEqual(true, v($el), "empty value should return true if not required");
+    });
 
-module("Module A");
-
-test("first test within module", function() {
-  ok( true, "all pass" );
-});
-
-test("second test within module", function() {
-  ok( true, "all pass" );
-});
-
-module("Module B");
-
-test("some other test", function() {
-  expect(2);
-  equals( true, false, "failing test" );
-  equals( true, true, "passing test" );
-});
-
+    test("test email builtin success", function(){
+      expect(3);
+      ["valid@test.com", "ian.asaff@test.com", "Test_You@boo.gov"].map(function(input){
+        (function(){
+          var $el = setUp(input).validizzle({
+            builtins: ['email']
+          });
+          strictEqual(true, v($el), "email should have passed: " + input);
+        })();
+      });
+    });
+    
+    test("test email builtin failure", function(){
+      expect(3);
+      ["valid@testcom", "ian.asafftest.com", "Test_You[]00&@@boo.gov"].map(function(input){
+        (function(){
+          var $el = setUp(input).validizzle({
+            builtins: ['email']
+          });
+          strictEqual(false, v($el), "email should have failed: " + input);
+        })();
+      });
+    });
+    
+    test("test required builtin success", function(){
+      var $el = setUp("hi").validizzle({
+        builtins: ['required']
+      });
+      strictEqual(true, v($el), "required input should have been valid: " + $el.val());
+    });
+    
+    test("test required failure", function(){
+      expect(2);
+      var $el = setUp("").validizzle({
+        builtins: ['required']
+      });
+      strictEqual(false, v($el), "blank input should fail");
+      
+      $el.val('   ');
+      strictEqual(false, v($el), "whitespace input should fail");
+    });
+    //test("validations that aren't required return true if blank")
+    // test("a basic test example", function() {
+    //      ok( true, "this test is fine" );
+    //      var value = "hello";
+    //      equals( "hello", value, "We expect value to be hello" );
+    //    });
+    // 
+    //    module("Module A");
+    // 
+    //    test("first test within module", function() {
+    //      ok( true, "all pass" );
+    //    });
+    // 
+    //    test("second test within module", function() {
+    //      ok( true, "all pass" );
+    //    });
+    // 
+    //    module("Module B");
+    // 
+    //    test("some other test", function() {
+    //      expect(2);
+    //      equals( true, false, "failing test" );
+    //      equals( true, true, "passing test" );
+    //    });
+   
   });
   </script>
   
