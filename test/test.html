@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <script src="http://code.jquery.com/jquery-latest.js"></script>
+  <script src="../lib/jquery-1.5.2.min.js"></script>
   <link rel="stylesheet" href="http://code.jquery.com/qunit/git/qunit.css" type="text/css" media="screen" />
 <script type="text/javascript" src="http://code.jquery.com/qunit/git/qunit.js"></script>
 <script src="../lib/jquery.validizzle.js" type="text/javascript" charset="utf-8"></script>
@@ -14,7 +14,7 @@
   			console.log(input);
   		}
   	}
-  	d.dbg = true;
+  	d.dbg = false;
   	
     function setUp(val){
       var value = val === undefined ? "" : val;
@@ -28,46 +28,42 @@
     /* TEST CODE */
     module("validizzle");
     test("testing unobtrusiveness", function(){
-      expect(2);
       var $el = setUp().validizzle();
-      strictEqual(true, v($el), "no params passed in should always return true");
+      strictEqual(v($el), true, "no params passed in should always return true");
       
       $el = setUp().validizzle({
         builtins: ['email']
       });
       
-      strictEqual(true, v($el), "empty value should return true if not required");
+      strictEqual(v($el), true, "empty value should return true if not required");
     });
 
     test("test email builtin success", function(){
-      expect(3);
       ["valid@test.com", "ian.asaff@test.com", "Test_You@boo.gov"].map(function(input){
         (function(){
           var $el = setUp(input).validizzle({
             builtins: ['email']
           });
-          strictEqual(true, v($el), "email should have passed: " + input);
+          strictEqual(v($el), true, "email should have passed: " + input);
         })();
       });
     });
     
     test("test email validation that is not required", function(){
-      expect(2);
       var $el = setUp("").validizzle({builtins:['email']});
-      strictEqual(true, v($el), "blank value should be valid if email is not required");
+      strictEqual(v($el), true, "blank value should be valid if email is not required");
       
       $el.val("   ");
-      strictEqual(false, v($el), "whitespace should be invalid if email is not required");
+      strictEqual(v($el), false, "whitespace should be invalid if email is not required");
     });
     
     test("test email builtin failure", function(){
-      expect(3);
       ["valid@testcom", "ian.asafftest.com", "Test_You[]00&@@boo.gov"].map(function(input){
         (function(){
           var $el = setUp(input).validizzle({
             builtins: ['email']
           });
-          strictEqual(false, v($el), "email should have failed: " + input);
+          strictEqual(v($el), false, "email should have failed: " + input);
         })();
       });
     });
@@ -76,41 +72,175 @@
       var $el = setUp("hi").validizzle({
         builtins: ['required']
       });
-      strictEqual(true, v($el), "required input should have been valid: " + $el.val());
+      strictEqual(v($el), true, "required input should have been valid: " + $el.val());
     });
     
     test("test required failure", function(){
-      expect(2);
       var $el = setUp("").validizzle({
         builtins: ['required']
       });
-      strictEqual(false, v($el), "blank input should fail");
+      strictEqual(v($el), false, "blank input should fail");
       
       $el.val('   ');
-      strictEqual(false, v($el), "whitespace input should fail");
+      strictEqual(v($el), false, "whitespace input should fail");
     });
     
     test("test required email. order of rules shouldn't matter.",function(){
-       expect(8);
        [['email','required'],['required','email']].map(function(input){
           (function(){
             var $el = setUp("").validizzle({
               builtins: ['email','required']
             });
-            strictEqual(false, v($el), "blank fails if email is required");
+            strictEqual(v($el), false, "blank fails if email is required");
 
             $el.val('  ');
-            strictEqual(false, v($el), "whitespace fails if email is required");
+            strictEqual(v($el), false, "whitespace fails if email is required");
 
             $el.val('test@test');
-            strictEqual(false, v($el), "invalid email fails if email is required: |test@test|");
+            strictEqual(v($el), false, "invalid email fails if email is required: |test@test|");
 
             $el.val('bite@me.gov');
-            strictEqual(true, v($el), "valid email passes if email is required")
+            strictEqual(v($el), true, "valid email passes if email is required")
           })();
         });
     });
-  });
+	
+	test("test minimum length", function(){
+		var $el = setUp("").validizzle({
+			minLength: 4
+		});
+		strictEqual(v($el), true, "minimum length passes if field is not required and blank")
+		
+		$el.val("h");
+		strictEqual(v($el), false, "minimum length fails if field is less than minimum length");
+		
+		$el.val("1234");
+		strictEqual(v($el), true, "minimum length passes if field is equal to minimum length");
+		
+		$el.val("1234jjadsf");
+		strictEqual(v($el), true, "minimum length passes if field is greater than minimum length");	
+	});
+
+	test("test minimum length required", function(){
+		var $el = setUp("").validizzle({
+			builtins: ['required'],
+			minLength: 4
+		});
+		strictEqual(v($el), false, "minimum length fails if field is blank and required");
+		
+		$el.val("hhhh");
+		strictEqual(v($el), true, "minimum length passes if field is equal to minimum length and is required");
+
+		$el.val("hhhhjjjj");
+		strictEqual(v($el), true, "minimum length passes if field is greater than minimum length and is required");
+		
+	});
+
+	test("test maximum length", function(){
+		var $el = setUp("").validizzle({
+			maxLength: 4
+		});
+		strictEqual(v($el), true, "maximum length passes if field is not required and blank")
+		
+		$el.val("hdddddddd");
+		strictEqual(v($el), false, "maximum length fails if field is greater than maximum length");
+		
+		$el.val("1234");
+		strictEqual(v($el), true, "maximum length passes if field is equal to maximum length");
+		
+		$el.val("123");
+		strictEqual(v($el), true, "maximum length passes if field is less than maximum length");
+	});
+	
+	test("test maximum length required", function(){
+		var $el = setUp("").validizzle({
+			builtins: ['required'],
+			maxLength: 4
+		});
+		strictEqual(v($el), false, "maximum length fails if field is blank and required");
+		
+		$el.val("hhhh");
+		strictEqual(v($el), true, "maximum length passes if field is equal to maximum length and is required");
+
+		$el.val("hhh");
+		strictEqual(v($el), true, "maximum length passes if field is less than maximum length and is required");	
+	});
+
+	test("test matchRegex validation", function(){
+		var $el = setUp("").validizzle({
+			matchRegex:/\d{4}\.\w{4}/
+		});
+		strictEqual(v($el), true, "matchRegex passes if field is not required and is blank");
+		
+		$el.val("asdf");
+		strictEqual(v($el), false, "matchRegex fails if field doesn't match regex");
+		
+		$el.val("4444.hhhh");
+		strictEqual(v($el), true, "matchRegex passes if field matches regex");
+	});
+	
+	test("test matchRegex validation required", function(){
+		var $el = setUp("").validizzle({
+			builtins: ['required'],
+			matchRegex:/\d{4}\.\w{4}/
+		});
+		strictEqual(v($el), false, "matchRegex fails if field is required and is blank");
+		
+		$el.val("asdf");
+		strictEqual(v($el), false, "matchRegex fails if field doesn't match regex");
+		
+		$el.val("4444.hhhh");
+		strictEqual(v($el), true, "matchRegex passes if field matches regex");
+	});
+	
+	test("test arbitrary function validations", function(){
+		var $el = setUp("").validizzle({
+			custom: function($input){
+				return $input.val().match(/\w{2}/) && $input.val() === "hi";
+			}
+		});
+		
+		strictEqual(v($el), true, "custom validations pass if field is blank and isn't required");
+		
+		$el.val("as");
+		strictEqual(v($el), false, "custom validations fail if one custom validation fails");
+		
+		$el.val("hi");
+		strictEqual(v($el), true, "custom validations pass if all custom validations pass");
+	});
+	
+	test("test arbitrary function validations that are required", function(){
+		var $el = setUp("").validizzle({
+			builtins: ['required'],
+			custom: function($input){
+				return $input.val().match(/\w{2}/) && $input.val() === "hi";
+			}
+		});
+		
+		strictEqual(v($el), false, "custom validations fail if field is blank and is required");
+		
+		$el.val("as");
+		strictEqual(v($el), false, "custom validations fail if one custom validation fails");
+		
+		$el.val("hi");
+		strictEqual(v($el), true, "custom validations pass if all custom validations pass");
+	});
+	
+	test("test onFail callback", function(){
+		var $el = setUp("deez nuts").validizzle({
+			builtins: ['required'],
+			matchRegex: /\w{4}/,
+			onFail: function($el){
+				$('<div id="findme"></div>').text($el.val()).appendTo('body');
+			}
+		});
+		v($el);
+		strictEqual($('#findme').length, 1, "onFail callback fires on validation failure");
+	});
+	
+  });//end of $(document).ready
+
+	
   </script>
   
 </head>
