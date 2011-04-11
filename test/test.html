@@ -2,12 +2,12 @@
 <html>
 <head>
   <script src="../lib/jquery-1.5.2.min.js"></script>
-  <link rel="stylesheet" href="http://code.jquery.com/qunit/git/qunit.css" type="text/css" media="screen" />
-<script type="text/javascript" src="http://code.jquery.com/qunit/git/qunit.js"></script>
+  <link rel="stylesheet" href="qunit.css" type="text/css" media="screen" />
+<script type="text/javascript" src="qunit.js"></script>
 <script src="../lib/jquery.validizzle.js" type="text/javascript" charset="utf-8"></script>
 
-  <script>
-  $(document).ready(function(){
+<script>
+$(document).ready(function(){
     /* HELPER FUNCTIONS */
     function d(input){
   		if (d.dbg){
@@ -227,38 +227,94 @@
 	});
 	
 	test("test onInvalid callback", function(){
-		var $el = setUp("www").validizzle({
+		var $el = setUp("HERRO").validizzle({
 			builtins: ['required'],
-			matchRegex: /\w{4}/,
-			onInvalid: function($el){
-				d("passed in: " + $el);
-				$('<div class="oninvalid"></div>').text($el.val()).appendTo('body');
-			}
+			matchRegex: /\w{8}/,
+      onInvalid: function($el){
+        $('<div class="oninvalid"></div>').text($el.val()).appendTo('body');
+      }
 		});
 		strictEqual(v($el), false, "validation should fail");
 		strictEqual($('.oninvalid').length, 1, "onInvalid callback fires on validation failure");
 		
-		$el.val('eeee');
+		$el.val('xxxxxxxx');
 		strictEqual(v($el), true, "validation should pass");
 		strictEqual($('.oninvalid').length, 1, "onInvalid callback doesn't fire when validation passes");
+    
+    $('.oninvalid').remove();
 	});
 	
-	test("test onValid callback", function(){
-		var $el = setUp("dddd").validizzle({
-			builtins: ['required'],
-			matchRegex: /\w{4}/,
-			onValid: function($el){
-				$('<div id="onvalid"></div>').text($el.val()).appendTo('body');
-			}
-		});
-		strictEqual(v($el), true, "validation should pass");
-		strictEqual($('.oninvalid').length, 1, "onInvalid callback fires on validation failure");
-		
-		$el.val('eee');
-		strictEqual(v($el), false, "validation should fail");
-		strictEqual($('.oninvalid').length, 1, "onInvalid callback doesn't fire when validation passes");
-	});
-  });//end of $(document).ready
+  test("test onValid callback", function(){
+     var $el = setUp("dddd").validizzle({
+       builtins: ['required'],
+       matchRegex: /\w{4}/,
+       onValid: function($el){
+         $('<div class="onvalid"></div>').text($el.val()).appendTo('body');
+       }
+     });
+     strictEqual(v($el), true, "validation should pass");
+     strictEqual($('.onvalid').length, 1, "onValid callback fires on validation pass");
+     
+     $el.val('eee');
+     strictEqual(v($el), false, "validation should fail");
+     strictEqual($('.onvalid').length, 1, "onValid callback doesn't fire when validation fails");
+    
+    $('.onvalid').remove();
+    });
+  
+    test("test on multiple elements", function(){
+      var $el = setUp().add('<input type="text" value="" name="test_input_2"/>');
+
+      $el.validizzle({
+        builtins: ['required']
+      });
+      
+      strictEqual($el.length, 2, "should have 2 elements");
+      
+      strictEqual(v($el), false, "should fail if all elements fail");
+      
+      $($el.get(0)).val('hi mom');
+      
+      strictEqual($($el.get(0)).val(), 'hi mom', "one element should have a value set");
+      strictEqual($($el.get(1)).val(), '', "one element should have no value set");
+      strictEqual(v($el), false, "validation should fail if one element is invalid");
+      
+      $($el.get(1)).val('hi dad');
+      strictEqual(v($el), true, "validation should pass if all elements are valid");
+    });
+    
+    test("multiple elements callbacks", function(){
+      var $el = setUp("input1").add('<input type="text" value="input2" name="test_input_2"/>');
+
+      $el.validizzle({
+        matchRegex: /\d{4}/,
+        onValid: function($el){
+          $('<div class="onvalid"></div>').text($el.val()).appendTo('body');
+        },
+        onInvalid: function($el){
+          $('<div class="oninvalid"></div>').text($el.val()).appendTo('body');
+        }
+      });
+      
+      v($el);
+      strictEqual($(".oninvalid").length, 2, "both elements get callbacks if they fail");
+      strictEqual($($(".oninvalid").get(0)).text(), "input1", "oninvalid callback is executed in the correct context");
+      strictEqual($($(".oninvalid").get(1)).text(), "input2", "oninvalid callback is executed in the correct context");
+      
+      $('.oninvalid').remove();
+      
+      $($el.get(0)).val('9999');
+      $($el.get(1)).val('8888');
+      
+      v($el);
+      strictEqual($(".onvalid").length, 2, "both elements get callbacks if they pass");
+      strictEqual($($(".onvalid").get(0)).text(), "9999", "onvalid callback is executed in the correct context");
+      strictEqual($($(".onvalid").get(1)).text(), "8888", "onvalid callback is executed in the correct context");
+
+      $('.onvalid').remove();
+    });
+  
+});//end of $(document).ready
 
 	
   </script>
