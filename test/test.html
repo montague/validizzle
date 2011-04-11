@@ -14,7 +14,7 @@
   			console.log(input);
   		}
   	}
-  	d.dbg = false;
+  	d.dbg = true;
   	
     function setUp(val){
       var value = val === undefined ? "" : val;
@@ -226,17 +226,34 @@
 		strictEqual(v($el), true, "custom validations pass if all custom validations pass");
 	});
 	
-	test("test onFail callback", function(){
-		var $el = setUp("deez nuts").validizzle({
+	test("test onInvalid callback", function(){
+		var $el = setUp("www").validizzle({
 			builtins: ['required'],
 			matchRegex: /\w{4}/,
-			onFail: function($el){
-				$('<div id="findme"></div>').text($el.val()).appendTo('body');
+			onInvalid: function($el){
+				d("passed in: " + $el);
+				$('<div class="oninvalid"></div>').text($el.val()).appendTo('body');
 			}
 		});
-		v($el);
-		strictEqual($('#findme').length, 1, "onFail callback fires on validation failure");
+		strictEqual(v($el), false, "onInvalid callback fires when validation fails");
+		//strictEqual($('.oninvalid').length, 1, "onInvalid callback fires on validation failure");
+		
+		$el.val('eeee');
+		strictEqual(v($el), true, "onInvalid callback shouldn't fire when validation passes");
+		//strictEqual($('.oninvalid').length, 1, "onInvalid callback doesn't fire when validation passes");
 	});
+	
+	// test("test onValid callback", function(){
+	// 	var $el = setUp("dddd").validizzle({
+	// 		builtins: ['required'],
+	// 		matchRegex: /\w{4}/,
+	// 		onInvalid: function($el){
+	// 			$('<div id="onvalid"></div>').text($el.val()).appendTo('body');
+	// 		}
+	// 	});
+	// 	strictEqual(v($el), true, "onvalid callback fires when validation passes");
+	// 	strictEqual($('#onvalid').length, 1, "onValid callback fires on validation failure");
+	// });
 	
   });//end of $(document).ready
 
