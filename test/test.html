@@ -313,6 +313,14 @@ $(document).ready(function(){
 
       $('.onvalid').remove();
     });
+    
+    test("called on a non-existent element", function(){
+      var $el = $('#blargh').validizzle({
+        builtins:['required']
+      });
+      
+      strictEqual(v($el), false, "should return false because no element was found");
+    });
   
 });//end of $(document).ready
 
