@@ -30,7 +30,7 @@ $(document).ready(function(){
     });
 
     test("test email builtin success", function(){
-      ["valid@test.com", "ian.asaff@test.com", "Test_You@boo.gov"].map(function(input){
+      $.each(["valid@test.com", "ian.asaff@test.com", "Test_You@boo.gov"], function(i,input){
         (function(){
           var $el = setUp(input).validizzle({
             builtins: ['email']
@@ -49,7 +49,7 @@ $(document).ready(function(){
     });
     
     test("test email builtin failure", function(){
-      ["valid@testcom", "ian.asafftest.com", "Test_You[]00&@@boo.gov"].map(function(input){
+      $.each(["valid@testcom", "ian.asafftest.com", "Test_You[]00&@@boo.gov"], function(i,input){
         (function(){
           var $el = setUp(input).validizzle({
             builtins: ['email']
@@ -77,10 +77,10 @@ $(document).ready(function(){
     });
     
     test("test required email. order of rules shouldn't matter.",function(){
-       [['email','required'],['required','email']].map(function(input){
+       $.each([['email','required'],['required','email']],function(i,input){
           (function(){
             var $el = setUp("").validizzle({
-              builtins: ['email','required']
+              builtins: input
             });
             strictEqual(v($el), false, "blank fails if email is required");
 
