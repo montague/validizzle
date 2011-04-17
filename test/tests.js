@@ -353,5 +353,19 @@ $(document).ready(function(){
       $('.onvalid').remove();
     });
     
-  
+  	test("calling validizzle again will change the validations", function(){
+		var $el = setUp("ddd").validizzle({
+	       builtins: ['required'],
+	       matchRegex: /\w{4}/  
+	    }); 
+		
+		strictEqual(v($el), false, "should fail validation when regex fails");
+		
+		$el.validizzle({
+	       builtins: ['required']
+	    });
+		
+		strictEqual(v($el), true, "should pass validation when regex validation is removed");
+	});
+
 });//end of $(document).ready
