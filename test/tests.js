@@ -12,6 +12,12 @@ $(document).ready(function(){
       return $('<input type="text" value="' + value + '" name="test_input"/>')
     }
     
+	function setUpFixture(){
+		$('#qunit-fixture')
+			.append('<input type="text" name="txt_input" id="txt_input"/>')
+			.append('<p style="display:none;">error message</p>');
+	}
+
     function v($el){
       return $el.validizzle('is_valid');
     }
@@ -31,12 +37,10 @@ $(document).ready(function(){
 
     test("test email builtin success", function(){
       $.each(["valid@test.com", "ian.asaff@test.com", "Test_You@boo.gov"], function(i,input){
-        (function(){
           var $el = setUp(input).validizzle({
             builtins: ['email']
           });
           strictEqual(v($el), true, "email should have passed: " + input);
-        })();
       });
     });
     
@@ -50,12 +54,10 @@ $(document).ready(function(){
     
     test("test email builtin failure", function(){
       $.each(["valid@testcom", "ian.asafftest.com", "Test_You[]00&@@boo.gov"], function(i,input){
-        (function(){
           var $el = setUp(input).validizzle({
             builtins: ['email']
           });
           strictEqual(v($el), false, "email should have failed: " + input);
-        })();
       });
     });
     
@@ -78,7 +80,6 @@ $(document).ready(function(){
     
     test("test required email. order of rules shouldn't matter.",function(){
        $.each([['email','required'],['required','email']],function(i,input){
-          (function(){
             var $el = setUp("").validizzle({
               builtins: input
             });
@@ -92,7 +93,6 @@ $(document).ready(function(){
 
             $el.val('bite@me.gov');
             strictEqual(v($el), true, "valid email passes if email is required")
-          })();
         });
     });
 	
@@ -367,5 +367,7 @@ $(document).ready(function(){
 		
 		strictEqual(v($el), true, "should pass validation when regex validation is removed");
 	});
+	
+	
 
 });//end of $(document).ready
