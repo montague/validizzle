@@ -368,6 +368,21 @@ $(document).ready(function(){
 		strictEqual(v($el), true, "should pass validation when regex validation is removed");
 	});
 	
-	
+	test("automatically fires is_valid onBlur", function(){
+		var testString = 'hi mom',
+			$el = setUp().validizzle({
+				builtins: ['required'],
+				matchRegex: /\w{4}/, 
+				onInvalid: function($el){
+					$el.text(testString);
+				}
+			});
+		
+		strictEqual($el.text(), '');
+		
+		$el.blur();
+		
+		strictEqual($el.text(), testString);
+	});
 
 });//end of $(document).ready
