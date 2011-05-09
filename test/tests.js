@@ -6,7 +6,7 @@ $(document).ready(function(){
   		}
   	}
   	d.dbg = true;
-  	
+    
     function setUp(val){
       var value = val === undefined ? "" : val;
       return $('<input type="text" value="' + value + '" name="test_input"/>')
