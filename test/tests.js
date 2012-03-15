@@ -406,5 +406,25 @@ $(document).ready(function(){
 		strictEqual($el.text(), testString);
 	});
 	
+	test("validate select on change by default", function(){
+		var $el = $('<select><option value="" selected="selected"/><option value="hi"/></select>').validizzle({
+			builtins: ['required'],
+			onValid: function($el){
+	        $('<div class="onvalid"></div>').appendTo('body');
+	      },
+	      onInvalid: function($el){
+	        $('<div class="oninvalid"></div>').appendTo('body');
+	      }
+		});
+		
+		v($el);
+		strictEqual($(".oninvalid").length, 1, "element should have failed");
+		strictEqual($(".onvalid").length, 0, "element should have failed");
+
+		$('.oninvalid').remove();
+		
+		$el.val('hi').change();
+		strictEqual($(".onvalid").length, 1, "element should have passed");
+	});
 
 });//end of $(document).ready
