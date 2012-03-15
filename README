@@ -1,5 +1,7 @@
 really simple jquery validation plugin. set it on an element, and you get a true (is valid) or false (is not valid) back.
 
-proper readme coming soon. for now, take a peek at test/test.js :)
+proper readme coming soon. for now, take a peek at test/test.js
+
+this is a work in progress. use at your own risk.
 
 snoop dogg's favorite validation plug-in.
